@@ -25,37 +25,38 @@ def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
 @cli.command(name="add")
 @click.argument("name", nargs=1)
 @click.pass_obj
-def add_cmd(app: App, name: str):
+def add_cmd(app: App, name: str) -> None:
     app.add_note(name)
 
 
 @cli.command(name="open")
+@click.argument("name", nargs=1)
 @click.pass_obj
-def open_cmd(app: App):
-    raise NotImplementedError()
+def open_cmd(app: App, name: str) -> None:
+    app.open_note(name)
 
 
 @cli.command(name="daily")
 @click.pass_obj
-def daily_cmd(app: App):
+def daily_cmd(app: App) -> None:
     raise NotImplementedError()
 
 
 @cli.command(name="grep")
 @click.pass_obj
-def grep_cmd(app: App):
+def grep_cmd(app: App) -> None:
     raise NotImplementedError()
 
 
 @cli.command(name="list")
 @click.pass_obj
-def list_cmd(app: App):
+def list_cmd(app: App) -> None:
     app.list_notes()
 
 
 @cli.command(name="delete")
 @click.pass_obj
-def delete_cmd(app: App):
+def delete_cmd(app: App) -> None:
     raise NotImplementedError()
 
 
