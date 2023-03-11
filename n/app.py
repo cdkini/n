@@ -27,7 +27,7 @@ class App:
         with path.open("w") as f:
             f.write(yfm_str)
 
-        open_with_editor(editor=self._editor, path=path)
+        subprocess.call([self._editor, path.as_posix()])
         with path.open() as f:
             contents = f.read()
 
@@ -38,8 +38,3 @@ class App:
     def list_notes(self) -> None:
         for name in self._notes:
             print(name)
-
-
-def open_with_editor(editor: str, path: pathlib.Path) -> None:
-    command = [editor, path.as_posix()]
-    subprocess.call(command)
