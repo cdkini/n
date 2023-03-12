@@ -16,42 +16,49 @@ class App:
         self._editor = editor or App.DEFAULT_EDITOR
 
     def add_note(self, name: str, tags: tuple[str, ...]) -> None:
-        path = self._root.joinpath(f"{name}.md")
+        path = self._build_note_path(name)
         if path.exists():
             raise ValueError(f"'{name}' already exists.")
 
         yfm = YAMLFrontMatter(title=name, tags=tags)
-        yfm_str = str(yfm)
         with path.open("w") as f:
-            f.write(yfm_str)
+            f.write(str(yfm))
 
         self._open_with_editor(path)
-
-        # Don't save if no edits were made
         with path.open() as f:
             contents = f.read()
-            if contents == yfm_str:
+            # Don't save if no edits were made
+            if contents == yfm:
                 path.unlink()
 
     def open_note(self, name: str) -> None:
-        path = self._root.joinpath(f"{name}.md")
+        path = self._build_note_path(name)
         if not path.exists():
             raise ValueError(f"'{name}' does not exist.")
-
         self._open_with_editor(path)
 
     def open_daily_note(self) -> None:
         name = dt.date.today().isoformat()
-        path = self._root.joinpath(f"{name}.md")
+        path = self._build_note_path(name)
         if path.exists():
             self.open_note(name)
         else:
-            self.add_note(name=name, tags=["daily"])
+            self.add_note(name=name, tags=("daily",))
 
     def list_notes(self) -> None:
         notes = sorted(filter(lambda n: n.suffix == ".md", self._root.iterdir()))
         for note in notes:
             print(note.stem)
+
+    def delete_note(self, name: str) -> None:
+        path = self._build_note_path(name)
+        try:
+            path.unlink(missing_ok=False)
+        except FileNotFoundError:
+            raise ValueError(f"'{name}' does not exist.")
+
+    def _build_note_path(self, name: str) -> pathlib.Path:
+        return self._root.joinpath(f"{name}.md")
 
     def _open_with_editor(self, path: pathlib.Path):
         subprocess.call([self._editor, path.as_posix()])

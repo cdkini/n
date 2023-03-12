@@ -17,3 +17,8 @@ class YAMLFrontMatter:
         contents.append(f"tags: {', '.join(tag for tag in self._tags)}")
         contents.append("---")
         return "\n".join(c for c in contents)
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, str):
+            return str(self) == __o
+        return super().__eq__(__o)

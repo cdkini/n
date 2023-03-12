@@ -56,9 +56,10 @@ def list_cmd(app: App) -> None:
 
 
 @cli.command(name="delete")
+@click.argument("name", nargs=1)
 @click.pass_obj
-def delete_cmd(app: App) -> None:
-    raise NotImplementedError()
+def delete_cmd(app: App, name: str) -> None:
+    app.delete_note(name)
 
 
 if __name__ == "__main__":
