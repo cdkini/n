@@ -10,6 +10,7 @@ from n.frontmatter import YAMLFrontMatter
 class App:
 
     DEFAULT_EDITOR = "vim"
+    GREP = "rg"
 
     def __init__(self, root: pathlib.Path, editor: str | None) -> None:
         self._root = root
@@ -56,6 +57,13 @@ class App:
             path.unlink(missing_ok=False)
         except FileNotFoundError:
             raise ValueError(f"'{name}' does not exist.")
+
+    def grep(self, args: tuple[str, ...]) -> None:
+        command = [App.GREP]
+        for arg in args:
+            command.append(arg)
+        command.append(self._root.as_posix())
+        subprocess.call(command)
 
     def _build_note_path(self, name: str) -> pathlib.Path:
         return self._root.joinpath(f"{name}.md")

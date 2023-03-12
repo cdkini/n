@@ -44,10 +44,13 @@ def daily_cmd(app: App) -> None:
     app.open_daily_note()
 
 
-@cli.command(name="grep")
+@cli.command(
+    "grep", context_settings=dict(ignore_unknown_options=True, allow_extra_args=True)
+)
+@click.argument("args", nargs=-1)
 @click.pass_obj
-def grep_cmd(app: App) -> None:
-    raise NotImplementedError()
+def grep_cmd(app: App, args: tuple[str, ...]) -> None:
+    app.grep(args)
 
 
 @cli.command(name="list")
