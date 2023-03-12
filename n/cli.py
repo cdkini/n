@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pathlib
+import sys
 
 import click
 
@@ -63,4 +64,8 @@ def delete_cmd(app: App, name: str) -> None:
 
 
 if __name__ == "__main__":
-    cli()
+    try:
+        cli()
+    except Exception as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
