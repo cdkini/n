@@ -39,7 +39,7 @@ def open_cmd(app: App, name: str) -> None:
 @cli.command(name="daily")
 @click.pass_obj
 def daily_cmd(app: App) -> None:
-    raise NotImplementedError()
+    app.open_daily_note()
 
 
 @cli.command(name="grep")
