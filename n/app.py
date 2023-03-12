@@ -7,18 +7,18 @@ import subprocess
 import click
 from thefuzz import process
 
+from n.editor import Editor
 from n.frontmatter import YAMLFrontMatter
 
 
 class App:
 
-    DEFAULT_EDITOR = "vim"
     GREP = "rg"
     FUZZ_THRESHOLD = 90
 
     def __init__(self, root: pathlib.Path, editor: str | None) -> None:
         self._root = root
-        self._editor = editor or App.DEFAULT_EDITOR
+        self._editor = Editor(editor)
 
     def add_note(self, name: str, tags: tuple[str, ...]) -> None:
         path = self._build_note_path(name)
@@ -33,7 +33,7 @@ class App:
         with path.open("w") as f:
             f.write(str(yfm))
 
-        self._open_with_editor(path)
+        self._editor.open(path)
         with path.open() as f:
             contents = f.read()
             # Don't save if no edits were made
@@ -54,8 +54,7 @@ class App:
         print("Found similar existing notes; please pick which one you'd like to view:")
         text = f"  1) {name} (USER INPUT)\n"
         text += "\n".join(
-            f"  {i}) {candidate}"
-            for i, candidate in enumerate(viable_candidates, 2)
+            f"  {i}) {candidate}" for i, candidate in enumerate(viable_candidates, 2)
         )
         text += "\n"
         selection = int(
@@ -72,7 +71,7 @@ class App:
         path = self._build_note_path(name)
         if not path.exists():
             raise ValueError(f"'{name}' does not exist.")
-        self._open_with_editor(path)
+        self._editor.open(path)
 
     def open_daily_note(self) -> None:
         name = dt.date.today().isoformat()
@@ -106,6 +105,3 @@ class App:
 
     def _build_note_path(self, name: str) -> pathlib.Path:
         return self._root.joinpath(f"{name}.md")
-
-    def _open_with_editor(self, path: pathlib.Path):
-        subprocess.call([self._editor, path.as_posix()])
