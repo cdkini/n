@@ -52,11 +52,9 @@ class App:
             return None
 
         print("Found similar existing notes; please pick which one you'd like to view:")
-        text = f"  1) {name} (USER INPUT)\n"
-        text += "\n".join(
-            f"  {i}) {candidate}" for i, candidate in enumerate(viable_candidates, 2)
+        text = App._construct_fuzzy_match_prompt(
+            name=name, candidates=viable_candidates
         )
-        text += "\n"
         selection = int(
             click.prompt(
                 text=text,
@@ -66,6 +64,15 @@ class App:
         if selection == 1:
             return None
         return viable_candidates[selection - 2]
+
+    @staticmethod
+    def _construct_fuzzy_match_prompt(name: str, candidates: list[str]) -> str:
+        text = f"  1) {name} (USER INPUT)\n"
+        text += "\n".join(
+            f"  {i}) {candidate}" for i, candidate in enumerate(candidates, 2)
+        )
+        text += "\n"
+        return text
 
     def open_note(self, name: str) -> None:
         path = self._build_note_path(name)
