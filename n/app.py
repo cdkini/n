@@ -4,6 +4,9 @@ import datetime as dt
 import pathlib
 import subprocess
 
+import click
+from thefuzz import process
+
 from n.frontmatter import YAMLFrontMatter
 
 
@@ -11,6 +14,7 @@ class App:
 
     DEFAULT_EDITOR = "vim"
     GREP = "rg"
+    FUZZ_THRESHOLD = 90
 
     def __init__(self, root: pathlib.Path, editor: str | None) -> None:
         self._root = root
@@ -20,6 +24,10 @@ class App:
         path = self._build_note_path(name)
         if path.exists():
             raise ValueError(f"'{name}' already exists.")
+
+        existing_note = self._fuzzy_match_existing_notes(name)
+        if existing_note:
+            return self.open_note(existing_note)
 
         yfm = YAMLFrontMatter(title=name, tags=tags)
         with path.open("w") as f:
@@ -31,6 +39,34 @@ class App:
             # Don't save if no edits were made
             if contents == yfm:
                 path.unlink()
+
+    def _fuzzy_match_existing_notes(self, name: str) -> str | None:
+        notes = self._collect_notes()
+        candidates = process.extractBests(name.lower(), notes)
+        viable_candidates = [
+            candidate.stem
+            for candidate, score in candidates
+            if score >= App.FUZZ_THRESHOLD
+        ]
+        if not viable_candidates:
+            return None
+
+        print("Found similar existing notes; please pick which one you'd like to view:")
+        text = f"  1) {name} (USER INPUT)\n"
+        text += "\n".join(
+            f"  {i}) {candidate}"
+            for i, candidate in enumerate(viable_candidates, 2)
+        )
+        text += "\n"
+        selection = int(
+            click.prompt(
+                text=text,
+            )
+        )
+
+        if selection == 1:
+            return None
+        return viable_candidates[selection - 2]
 
     def open_note(self, name: str) -> None:
         path = self._build_note_path(name)
@@ -47,9 +83,12 @@ class App:
             self.add_note(name=name, tags=("daily",))
 
     def list_notes(self) -> None:
-        notes = sorted(filter(lambda n: n.suffix == ".md", self._root.iterdir()))
+        notes = self._collect_notes()
         for note in notes:
             print(note.stem)
+
+    def _collect_notes(self) -> list[pathlib.Path]:
+        return sorted(filter(lambda n: n.suffix == ".md", self._root.iterdir()))
 
     def delete_note(self, name: str) -> None:
         path = self._build_note_path(name)
