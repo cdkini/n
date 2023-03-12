@@ -15,7 +15,7 @@ class App:
         self._root = root
         self._editor = editor or App.DEFAULT_EDITOR
 
-    def add_note(self, name: str, tags: list[str] | None = None) -> None:
+    def add_note(self, name: str, tags: tuple[str, ...]) -> None:
         path = self._root.joinpath(f"{name}.md")
         if path.exists():
             raise ValueError(f"'{name}' already exists.")

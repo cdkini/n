@@ -24,9 +24,10 @@ def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
 
 @cli.command(name="add")
 @click.argument("name", nargs=1)
+@click.option("-t", "--tag", "tags", multiple=True)
 @click.pass_obj
-def add_cmd(app: App, name: str) -> None:
-    app.add_note(name)
+def add_cmd(app: App, name: str, tags: tuple[str, ...]) -> None:
+    app.add_note(name=name, tags=tags)
 
 
 @cli.command(name="open")
