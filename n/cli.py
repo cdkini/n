@@ -63,9 +63,13 @@ def delete_cmd(app: App, name: str) -> None:
     app.delete_note(name)
 
 
-if __name__ == "__main__":
+def main() -> None:
     try:
         cli()
     except Exception as e:
         print(f"ERROR: {e}")
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
