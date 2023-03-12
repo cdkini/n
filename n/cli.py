@@ -6,6 +6,7 @@ import sys
 import click
 
 from n.app import App
+from n.editor import Editor
 
 NOTES = "NOTES"
 EDITOR = "EDITOR"
@@ -20,7 +21,7 @@ def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
         raise ValueError(
             f"'{path}' is an invalid value for {NOTES}; please use an existing directory."
         )
-    ctx.obj = App(root=path, editor=editor)
+    ctx.obj = App(root=path, editor=Editor(editor))
 
 
 @cli.command(name="add")

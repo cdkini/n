@@ -16,9 +16,9 @@ class App:
     GREP = "rg"
     FUZZ_THRESHOLD = 90
 
-    def __init__(self, root: pathlib.Path, editor: str | None) -> None:
+    def __init__(self, root: pathlib.Path, editor: Editor) -> None:
         self._root = root
-        self._editor = Editor(editor)
+        self._editor = editor
 
     def add_note(self, name: str, tags: tuple[str, ...]) -> None:
         path = self._build_note_path(name)
