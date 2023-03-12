@@ -10,13 +10,16 @@ class YAMLFrontMatter:
         self._date = dt.date.today().isoformat()
 
     def __str__(self) -> str:
-        contents = []
-        contents.append("---")
-        contents.append(f"title: {self._title}")
-        contents.append(f"date: {self._date}")
-        contents.append(f"tags: {', '.join(tag for tag in self._tags)}")
-        contents.append("---")
-        return "\n".join(c for c in contents)
+        contents = [
+            "---",
+            f"title: {self._title}",
+            f"date: {self._date}",
+            "category: ",
+            f"tags: {', '.join(tag for tag in self._tags)}",
+            "---",
+            "\n\n",
+        ]
+        return "\n".join(contents)
 
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, str):
