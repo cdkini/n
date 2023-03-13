@@ -14,7 +14,6 @@ class YAMLFrontMatter:
             "---",
             f"title: {self._title}",
             f"date: {self._date}",
-            "category: ",
             f"tags: {', '.join(tag for tag in self._tags)}",
             "---",
             "\n\n",

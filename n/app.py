@@ -29,16 +29,22 @@ class App:
         if existing_note:
             return self.open_note(existing_note)
 
-        yfm = YAMLFrontMatter(title=name, tags=tags)
-        with path.open("w") as f:
-            f.write(str(yfm))
-
+        yfm = self._add_frontmatter(path=path, name=name, tags=tags)
         self._editor.open(path)
         with path.open() as f:
             contents = f.read()
             # Don't save if no edits were made
             if contents == yfm:
                 path.unlink()
+
+    @staticmethod
+    def _add_frontmatter(
+        path: pathlib.Path, name: str, tags: tuple[str, ...]
+    ) -> YAMLFrontMatter:
+        yfm = YAMLFrontMatter(title=name, tags=tags)
+        with path.open("w") as f:
+            f.write(str(yfm))
+        return yfm
 
     def _fuzzy_match_existing_notes(self, name: str) -> str | None:
         notes = self._collect_notes()
@@ -52,7 +58,7 @@ class App:
             return None
 
         print("Found similar existing notes; please pick which one you'd like to view:")
-        text = App._construct_fuzzy_match_prompt(
+        text = self._construct_fuzzy_match_prompt(
             name=name, candidates=viable_candidates
         )
         selection = int(
