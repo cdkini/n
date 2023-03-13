@@ -17,6 +17,9 @@ EDITOR = "EDITOR"
 @click.option("--editor", envvar=EDITOR, default="vim")
 @click.pass_context
 def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
+    """
+    n is a terminal-based notetaking system designed around speed and ease-of-use.
+    """
     if not path or not path.exists() or not path.is_dir():
         raise ValueError(
             f"'{path}' is an invalid value for {NOTES}; please use an existing directory."
@@ -29,6 +32,9 @@ def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
 @click.option("-t", "--tag", "tags", multiple=True)
 @click.pass_obj
 def add_cmd(app: App, name: str, tags: tuple[str, ...]) -> None:
+    """
+    Create a new note.
+    """
     app.add_note(name=name, tags=tags)
 
 
@@ -36,12 +42,18 @@ def add_cmd(app: App, name: str, tags: tuple[str, ...]) -> None:
 @click.argument("name", nargs=1)
 @click.pass_obj
 def open_cmd(app: App, name: str) -> None:
+    """
+    Open existing notes.
+    """
     app.open_note(name)
 
 
 @cli.command(name="daily")
 @click.pass_obj
 def daily_cmd(app: App) -> None:
+    """
+    Open your daily note.
+    """
     app.open_daily_note()
 
 
@@ -51,12 +63,18 @@ def daily_cmd(app: App) -> None:
 @click.argument("args", nargs=-1)
 @click.pass_obj
 def grep_cmd(app: App, args: tuple[str, ...]) -> None:
+    """
+    Search through notes with ripgrep.
+    """
     app.grep(args)
 
 
 @cli.command(name="list")
 @click.pass_obj
 def list_cmd(app: App) -> None:
+    """
+    List notes.
+    """
     app.list_notes()
 
 
@@ -64,6 +82,9 @@ def list_cmd(app: App) -> None:
 @click.argument("name", nargs=1)
 @click.pass_obj
 def delete_cmd(app: App, name: str) -> None:
+    """
+    Delete notes.
+    """
     app.delete_note(name)
 
 
