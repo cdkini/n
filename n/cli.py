@@ -66,7 +66,7 @@ def grep_cmd(app: App, args: tuple[str, ...]) -> None:
     """
     Search through notes with ripgrep.
     """
-    app.grep(args)
+    app.grep_notes(args)
 
 
 @cli.command(name="list")

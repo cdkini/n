@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import datetime as dt
 import pathlib
-import subprocess
 
 import click
 from thefuzz import process
 
 from n.editor import Editor
 from n.frontmatter import YAMLFrontMatter
+from n.util import grep
 
 
 class App:
 
-    GREP = "rg"
     FUZZ_THRESHOLD = 90
 
     def __init__(self, root: pathlib.Path, editor: Editor) -> None:
@@ -29,22 +28,7 @@ class App:
         if existing_note:
             return self.open_note(existing_note)
 
-        yfm = self._add_frontmatter(path=path, name=name, tags=tags)
-        self._editor.open(path)
-        with path.open() as f:
-            contents = f.read()
-            # Don't save if no edits were made
-            if contents == yfm:
-                path.unlink()
-
-    @staticmethod
-    def _add_frontmatter(
-        path: pathlib.Path, name: str, tags: tuple[str, ...]
-    ) -> YAMLFrontMatter:
-        yfm = YAMLFrontMatter(title=name, tags=tags)
-        with path.open("w") as f:
-            f.write(str(yfm))
-        return yfm
+        self._construct_note(path=path, name=name, tags=tags)
 
     def _fuzzy_match_existing_notes(self, name: str) -> str | None:
         notes = self._collect_notes()
@@ -80,6 +64,19 @@ class App:
         text += "\n"
         return text
 
+    def _construct_note(
+        self, path: pathlib.Path, name: str, tags: tuple[str, ...]
+    ) -> None:
+        yfm = YAMLFrontMatter(title=name, tags=tags)
+        with path.open("w") as f:
+            f.write(str(yfm))
+        self._editor.open(path)
+        with path.open() as f:
+            contents = f.read()
+            # Don't save if no edits were made
+            if contents == yfm:
+                path.unlink()
+
     def open_note(self, name: str) -> None:
         path = self._build_note_path(name)
         if not path.exists():
@@ -109,12 +106,8 @@ class App:
         except FileNotFoundError:
             raise ValueError(f"'{name}' does not exist.")
 
-    def grep(self, args: tuple[str, ...]) -> None:
-        command = [App.GREP]
-        for arg in args:
-            command.append(arg)
-        command.append(self._root.as_posix())
-        subprocess.call(command)
+    def grep_notes(self, args: tuple[str, ...]) -> None:
+        grep(target=self._root, args=args)
 
     def _build_note_path(self, name: str) -> pathlib.Path:
         return self._root.joinpath(f"{name}.md")
