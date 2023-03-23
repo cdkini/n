@@ -3,8 +3,6 @@ from __future__ import annotations
 import datetime as dt
 import pathlib
 
-import click
-
 from n.editor import Editor
 from n.frontmatter import YAMLFrontMatter
 from n.fuzzy_matcher import FuzzyMatcher
@@ -35,35 +33,10 @@ class App:
 
     def _fuzzy_match_existing_notes(self, name: str) -> str | None:
         notes = self._collect_notes()
-        note_names = [note.stem for note in notes]
-        viable_candidates = self._fuzzy_matcher.determine_candidates(
-            name=name, items=note_names
+        note_names = list(map(lambda n: n.stem, notes))
+        return self._fuzzy_matcher._prompt_user_with_fuzzy_matches(
+            name=name, candidates=note_names
         )
-        if not viable_candidates:
-            return None
-
-        print("Found similar existing notes; please pick which one you'd like to view:")
-        text = self._construct_fuzzy_match_prompt(
-            name=name, candidates=viable_candidates
-        )
-        selection = int(
-            click.prompt(
-                text=text,
-            )
-        )
-
-        if selection == 1:
-            return None
-        return viable_candidates[selection - 2]
-
-    @staticmethod
-    def _construct_fuzzy_match_prompt(name: str, candidates: list[str]) -> str:
-        text = f"  1) {name} (USER INPUT)\n"
-        text += "\n".join(
-            f"  {i}) {candidate}" for i, candidate in enumerate(candidates, 2)
-        )
-        text += "\n"
-        return text
 
     def _construct_note(
         self, path: pathlib.Path, name: str, tags: tuple[str, ...]
