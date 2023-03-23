@@ -6,7 +6,7 @@ import pathlib
 from n.editor import Editor
 from n.frontmatter import YAMLFrontMatter
 from n.fuzzy_matcher import FuzzyMatcher
-from n.util import cd, grep
+from n.util import grep
 
 
 class App:
@@ -17,8 +17,11 @@ class App:
         self._editor = editor
         self._fuzzy_matcher = fuzzy_matcher
 
-    def cd_to_root(self):
-        cd(self._root)
+    @classmethod
+    def create(cls, root: pathlib.Path, editor_name: str, fuzzy_threshold: int) -> App:
+        editor = Editor(editor_name)
+        fuzzy_matcher = FuzzyMatcher(fuzzy_threshold)
+        return cls(root=root, editor=editor, fuzzy_matcher=fuzzy_matcher)
 
     def add_note(self, name: str, tags: tuple[str, ...]) -> None:
         path = self._build_note_path(name)
@@ -34,7 +37,7 @@ class App:
     def _fuzzy_match_existing_notes(self, name: str) -> str | None:
         notes = self._collect_notes()
         note_names = list(map(lambda n: n.stem, notes))
-        return self._fuzzy_matcher._prompt_user_with_fuzzy_matches(
+        return self._fuzzy_matcher.prompt_user_with_fuzzy_matches(
             name=name, candidates=note_names
         )
 

@@ -6,30 +6,32 @@ import sys
 import click
 
 from n.app import App
-from n.editor import Editor
-from n.fuzzy_matcher import FuzzyMatcher
+from n.util import cd
 
 NOTES = "NOTES"
 EDITOR = "EDITOR"
+DEFAULT_EDITOR = "vim"
 FUZZY_THRESHOLD = 90
 
 
 @click.group
-@click.option("--path", envvar=NOTES, type=pathlib.Path)
-@click.option("--editor", envvar=EDITOR, default="vim")
+@click.option("--path", "root", envvar=NOTES, type=pathlib.Path)
+@click.option("--editor", "editor_name", envvar=EDITOR)
 @click.pass_context
-def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
+def cli(ctx: click.Context, root: pathlib.Path | None, editor_name: str | None):
     """
     n is a terminal-based notetaking system designed around speed and ease-of-use.
     """
-    if not path or not path.exists() or not path.is_dir():
+    if not root or not root.exists() or not root.is_dir():
         raise ValueError(
-            f"'{path}' is an invalid value for {NOTES}; please use an existing directory."
+            f"'{root}' is an invalid value for {NOTES}; please use an existing directory."
         )
-    editor_ = Editor(editor)
-    fuzzy_matcher = FuzzyMatcher(FUZZY_THRESHOLD)
-    app = App(root=path, editor=editor_, fuzzy_matcher=fuzzy_matcher)
-    app.cd_to_root()
+
+    editor_name = editor_name or DEFAULT_EDITOR
+    app = App.create(
+        root=root, editor_name=editor_name, fuzzy_threshold=FUZZY_THRESHOLD
+    )
+    cd(root)
     ctx.obj = app
 
 
