@@ -24,7 +24,9 @@ def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
         raise ValueError(
             f"'{path}' is an invalid value for {NOTES}; please use an existing directory."
         )
-    ctx.obj = App(root=path, editor=Editor(editor))
+    app = App(root=path, editor=Editor(editor))
+    app.cd_to_root()
+    ctx.obj = app
 
 
 @cli.command(name="add")

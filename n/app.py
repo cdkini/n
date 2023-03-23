@@ -8,7 +8,7 @@ from thefuzz import process
 
 from n.editor import Editor
 from n.frontmatter import YAMLFrontMatter
-from n.util import grep
+from n.util import cd, grep
 
 
 class App:
@@ -18,6 +18,9 @@ class App:
     def __init__(self, root: pathlib.Path, editor: Editor) -> None:
         self._root = root
         self._editor = editor
+
+    def cd_to_root(self):
+        cd(self._root)
 
     def add_note(self, name: str, tags: tuple[str, ...]) -> None:
         path = self._build_note_path(name)
