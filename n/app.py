@@ -4,20 +4,20 @@ import datetime as dt
 import pathlib
 
 import click
-from thefuzz import process
 
 from n.editor import Editor
 from n.frontmatter import YAMLFrontMatter
+from n.fuzzy_matcher import FuzzyMatcher
 from n.util import cd, grep
 
 
 class App:
-
-    FUZZ_THRESHOLD = 90
-
-    def __init__(self, root: pathlib.Path, editor: Editor) -> None:
+    def __init__(
+        self, root: pathlib.Path, editor: Editor, fuzzy_matcher: FuzzyMatcher
+    ) -> None:
         self._root = root
         self._editor = editor
+        self._fuzzy_matcher = fuzzy_matcher
 
     def cd_to_root(self):
         cd(self._root)
@@ -35,12 +35,10 @@ class App:
 
     def _fuzzy_match_existing_notes(self, name: str) -> str | None:
         notes = self._collect_notes()
-        candidates = process.extractBests(name.lower(), notes)
-        viable_candidates = [
-            candidate.stem
-            for candidate, score in candidates
-            if score >= App.FUZZ_THRESHOLD
-        ]
+        note_names = [note.stem for note in notes]
+        viable_candidates = self._fuzzy_matcher.determine_candidates(
+            name=name, items=note_names
+        )
         if not viable_candidates:
             return None
 

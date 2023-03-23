@@ -7,9 +7,11 @@ import click
 
 from n.app import App
 from n.editor import Editor
+from n.fuzzy_matcher import FuzzyMatcher
 
 NOTES = "NOTES"
 EDITOR = "EDITOR"
+FUZZY_THRESHOLD = 90
 
 
 @click.group
@@ -24,7 +26,9 @@ def cli(ctx: click.Context, path: pathlib.Path | None, editor: str | None):
         raise ValueError(
             f"'{path}' is an invalid value for {NOTES}; please use an existing directory."
         )
-    app = App(root=path, editor=Editor(editor))
+    editor_ = Editor(editor)
+    fuzzy_matcher = FuzzyMatcher(FUZZY_THRESHOLD)
+    app = App(root=path, editor=editor_, fuzzy_matcher=fuzzy_matcher)
     app.cd_to_root()
     ctx.obj = app
 
