@@ -4,10 +4,12 @@ import datetime as dt
 
 
 class YAMLFrontMatter:
-    def __init__(self, title: str, tags: tuple[str, ...]) -> None:
+    def __init__(
+        self, title: str, tags: tuple[str, ...], date: dt.date = dt.date.today()
+    ) -> None:
         self._title = title
         self._tags = tags
-        self._date = dt.date.today().isoformat()
+        self._date = date.isoformat()
 
     def __str__(self) -> str:
         contents = [
