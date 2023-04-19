@@ -5,7 +5,7 @@ from thefuzz import process
 
 
 class FuzzyMatcher:
-    def __init__(self, threshold: int) -> None:
+    def __init__(self, threshold: int = 90) -> None:
         self._threshold = threshold
 
     def prompt_user_with_fuzzy_matches(

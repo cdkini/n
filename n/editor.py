@@ -8,7 +8,7 @@ class Editor:
 
     DEFAULT_CMD = "vim"
 
-    def __init__(self, cmd: str | None) -> None:
+    def __init__(self, cmd: str | None = None) -> None:
         self._cmd = cmd or Editor.DEFAULT_CMD
 
     def open(self, path: pathlib.Path) -> None:

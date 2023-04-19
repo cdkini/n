@@ -23,7 +23,9 @@ class App:
         fuzzy_matcher = FuzzyMatcher(fuzzy_threshold)
         return cls(root=root, editor=editor, fuzzy_matcher=fuzzy_matcher)
 
-    def add_note(self, name: str, tags: tuple[str, ...], fuzzy_match: bool) -> None:
+    def add_note(
+        self, name: str, tags: tuple[str, ...], fuzzy_match: bool = True
+    ) -> pathlib.Path | None:
         path = self._build_note_path(name)
         if path.exists():
             raise ValueError(f"'{name}' already exists.")
@@ -34,7 +36,7 @@ class App:
         if existing_note:
             return self.open_note(existing_note)
 
-        self._construct_note(path=path, name=name, tags=tags)
+        return self._construct_note(path=path, name=name, tags=tags)
 
     def open_note(self, name: str) -> None:
         path = self._build_note_path(name)
@@ -78,7 +80,7 @@ class App:
 
     def _construct_note(
         self, path: pathlib.Path, name: str, tags: tuple[str, ...]
-    ) -> None:
+    ) -> pathlib.Path | None:
         yfm = YAMLFrontMatter(title=name, tags=tags)
         with path.open("w") as f:
             f.write(str(yfm))
@@ -88,6 +90,9 @@ class App:
             # Don't save if no edits were made
             if contents == yfm:
                 path.unlink()
+                return None
+
+        return path
 
     def _collect_notes(self) -> list[pathlib.Path]:
         return sorted(filter(lambda n: n.suffix == ".md", self._root.iterdir()))
