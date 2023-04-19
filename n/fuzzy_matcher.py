@@ -11,7 +11,7 @@ class FuzzyMatcher:
     def prompt_user_with_fuzzy_matches(
         self, name: str, candidates: list[str]
     ) -> str | None:
-        viable_candidates = self._determine_viable_candidates(
+        viable_candidates = self.determine_viable_candidates(
             name=name, candidates=candidates
         )
         if not viable_candidates:
@@ -26,7 +26,7 @@ class FuzzyMatcher:
             return None
         return viable_candidates[selection - 2]
 
-    def _determine_viable_candidates(
+    def determine_viable_candidates(
         self, name: str, candidates: list[str]
     ) -> list[str]:
         viable_candidates = process.extractBests(name.lower(), candidates)
@@ -38,11 +38,7 @@ class FuzzyMatcher:
 
     def _prompt_user_with_fuzzy_matches(self, name: str, candidates: list[str]) -> int:
         text = self._construct_fuzzy_match_prompt(name=name, candidates=candidates)
-        return int(
-            click.prompt(
-                text=text,
-            )
-        )
+        return self._prompt(text)
 
     def _construct_fuzzy_match_prompt(self, name: str, candidates: list[str]) -> str:
         text = f"  1) {name} (USER INPUT)\n"
@@ -51,3 +47,10 @@ class FuzzyMatcher:
         )
         text += "\n"
         return text
+
+    def _prompt(self, text: str) -> int:
+        return int(
+            click.prompt(
+                text=text,
+            )
+        )
