@@ -43,7 +43,7 @@ def add_cmd(app: App, name: str, tags: tuple[str, ...]) -> None:
     """
     Create a new note.
     """
-    app.add_note(name=name, tags=tags)
+    app.add_note(name=name, tags=tags, fuzzy_match=True)
 
 
 @cli.command(name="open")
